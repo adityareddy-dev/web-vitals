@@ -76,6 +76,12 @@ const attributeTTFB = (metric: TTFBMetric): TTFBMetricWithAttribution => {
         requestDuration: metric.value - connectEnd,
         navigationEntry: navigationEntry,
       };
+
+      // Left undefined when there's no referrer, since then it's unknown.
+      if (document.referrer) {
+        attribution.sameOriginNavigation =
+          new URL(document.referrer).origin === location.origin;
+      }
     }
   }
 

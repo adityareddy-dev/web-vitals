@@ -68,6 +68,13 @@ export interface TTFBAttribution {
    * example: navigationEntry?.serverTiming
    */
   navigationEntry?: PerformanceNavigationTiming | PerformanceSoftNavigation;
+  /**
+   * Whether the page was navigated to from a page on the same origin, based on
+   * `document.referrer`. Undefined when there is no referrer (e.g. a direct
+   * visit, or a referrer policy that strips it), and for soft navigations and
+   * bfcache restores.
+   */
+  sameOriginNavigation?: boolean;
 }
 
 /**

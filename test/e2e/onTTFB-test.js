@@ -622,6 +622,59 @@ describe('onTTFB()', async function () {
       assert.strictEqual(ttfb.attribution.connectionDuration, 0);
       assert.strictEqual(ttfb.attribution.requestDuration, 0);
       assert.strictEqual(ttfb.attribution.navigationEntry, undefined);
+      assert.strictEqual(ttfb.attribution.sameOriginNavigation, undefined);
+    });
+
+    it('reports sameOriginNavigation as undefined with no referrer', async function () {
+      await navigateTo('/test/ttfb?attribution=1');
+
+      const ttfb = await getTTFBBeacon();
+
+      assert.strictEqual(ttfb.navigationType, 'navigate');
+      assert.strictEqual(ttfb.attribution.sameOriginNavigation, undefined);
+    });
+
+    it('reports sameOriginNavigation as true from a same-origin page', async function () {
+      await navigateTo('/test/ttfb?attribution=1');
+
+      await getTTFBBeacon();
+      await clearBeacons();
+
+      const sameOriginLink = await $('#same-origin-link');
+      await sameOriginLink.click();
+
+      const ttfb = await getTTFBBeacon();
+
+      assert.strictEqual(ttfb.navigationType, 'navigate');
+      assert.strictEqual(ttfb.attribution.sameOriginNavigation, true);
+    });
+
+    it('reports sameOriginNavigation as false from a cross-origin page', async function () {
+      await navigateTo(
+        '/test/ttfb?attribution=1&referrer=https%3A%2F%2Fexample.com%2F',
+      );
+
+      const ttfb = await getTTFBBeacon();
+
+      assert.strictEqual(ttfb.navigationType, 'navigate');
+      assert.strictEqual(ttfb.attribution.sameOriginNavigation, false);
+    });
+
+    it('reports sameOriginNavigation as undefined after a bfcache restore', async function () {
+      await navigateTo(
+        '/test/ttfb?attribution=1&referrer=https%3A%2F%2Fexample.com%2F',
+      );
+
+      const ttfb1 = await getTTFBBeacon();
+      assert.strictEqual(ttfb1.attribution.sameOriginNavigation, false);
+
+      await clearBeacons();
+      await stubForwardBack();
+
+      const ttfb2 = await getTTFBBeacon();
+
+      assert.strictEqual(ttfb2.navigationType, 'back-forward-cache');
+      assert.strictEqual(ttfb2.attribution.sameOriginNavigation, undefined);
     });
 
     it('reports the correct value for Early Hints', async function () {
@@ -684,6 +737,7 @@ describe('onTTFB()', async function () {
       assert.equal(softTtfb.attribution.dnsDuration, 0);
       assert.equal(softTtfb.attribution.connectionDuration, 0);
       assert.equal(softTtfb.attribution.requestDuration, 0);
+      assert.strictEqual(softTtfb.attribution.sameOriginNavigation, undefined);
 
       const navEntry = softTtfb.attribution.navigationEntry;
       assert.deepEqual(navEntry, softNavEntry);

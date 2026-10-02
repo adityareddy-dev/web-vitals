@@ -23,6 +23,7 @@
   <p>Text below the image</p>
 
   <p><a id="navigate-away" href="https://example.com">Navigate away</a></p>
+  <p><a id="same-origin-link" href="/test/ttfb?attribution=1&amp;sameorigin=1">Same origin link</a></p>
   {% if prerender %}<p><a id="prerender-link" href="/test/ttfb{% if queryString %}?{{ queryString | safe }}{% endif %}">Prerender link</a></p>{% endif %}
 
   <p><button id="soft-nav">Soft navigate</button></p>
@@ -38,6 +39,12 @@
       const navEntry = performance.getEntriesByType('navigation')[0];
       Object.defineProperty(navEntry, 'responseStart', {
         value: Number(params.get('responseStart')),
+      });
+    }
+
+    if (params.has('referrer')) {
+      Object.defineProperty(document, 'referrer', {
+        value: params.get('referrer'),
       });
     }
   </script>
