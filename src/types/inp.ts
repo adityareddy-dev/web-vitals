@@ -85,7 +85,8 @@ export interface INPAttribution {
    * that corresponds to the interaction (i.e. the first `event` entry
    * containing an `interactionId` dispatched in a given animation frame).
    * For "pointerdown", "pointerup", or "click" events this will be "pointer",
-   * and for "keydown" or "keyup" events this will be "keyboard".
+   * and for "keydown", "keyup", or "input" events (e.g. typing with an IME)
+   * this will be "keyboard".
    * This value may not be set in cases where the event duration was less than
    * the browser minimum reporting threshold, and thus no entry was dispatched.
    */

@@ -468,9 +468,11 @@ export const onINP = (
       // return `undefined`, but we ignore this assuming the user knows what
       // they are doing.
       interactionTarget: interactionTargetMap.get(interaction!)!,
-      interactionType: firstEntry.name.startsWith('key')
-        ? 'keyboard'
-        : 'pointer',
+      // When typing with an IME, an interaction can have only `input` entries.
+      interactionType:
+        firstEntry.name.startsWith('key') || firstEntry.name === 'input'
+          ? 'keyboard'
+          : 'pointer',
       interactionTime: firstEntry.startTime,
       nextPaintTime: nextPaintTime,
       processedEventEntries: processedEventEntries,

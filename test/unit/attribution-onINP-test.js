@@ -498,4 +498,30 @@ describe('INP attribution subparts', () => {
     assert.strictEqual(a.longestScript.intersectingDuration, 94);
     assert.strictEqual(a.longestScript.subpart, 'processing-duration');
   });
+
+  it('reports typing with an IME as a keyboard interaction', async () => {
+    const reports = [];
+    onINP((metric) => reports.push(metric), {reportAllChanges: true});
+
+    // While composing, only the `input` event has an interactionId.
+    observers
+      .find((o) => o.types.includes('event'))
+      .cb({
+        getEntries: () => [
+          eventEntry({
+            name: 'input',
+            startTime: 1000,
+            duration: 128,
+            processingStart: 1002,
+            processingEnd: 1122,
+            interactionId: 7001,
+          }),
+        ],
+      });
+
+    await flush();
+
+    assert.strictEqual(reports.length, 1);
+    assert.strictEqual(reports[0].attribution.interactionType, 'keyboard');
+  });
 });
